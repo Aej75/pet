@@ -16,10 +16,14 @@ app.use(bodyParser.json());
 
 const postRoute = require('./routes/posts');
 
-const registerRoute = require('./routes/register')
+const registerRoute = require('./routes/register');
+
+const petRegisterRoute = require('./routes/pet_register')
 
 app.use('/register', registerRoute);
 app.use('/', postRoute);
+app.use('/pet_register', petRegisterRoute);
+
 
 
 

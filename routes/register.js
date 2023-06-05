@@ -1,6 +1,7 @@
 const express = require('express');
 const Register = require('../model/register');
 const GlobalResponse = require('../model/global_response');
+const { route } = require('./pet_register');
 
 const router = express.Router();
 
@@ -35,22 +36,28 @@ router.post('/', async (req, res) => {
 
 
 
+router.get('/', (req, res) => {
+
+});
+
+
 //Get Users
 router.get('/', async (req, res) => {
 
     try {
         const registeredUsers = await Register.find();
+
+
         const finalResponse = GlobalResponse({
             ok: true,
             data: registeredUsers
         });
+
+
         res.json(finalResponse);
     } catch (e) {
-        const errorRespnse = GlobalResponse({
-            ok: false,
-            data: registeredUsers
-        });
-        res.json(errorRespnse);
+        res.json({ "message": e });
+
     }
 });
 
@@ -65,11 +72,8 @@ router.delete('/:id', async (req, res) => {
         res.json(finalResponse);
 
     } catch (e) {
-        const errorRespnse = GlobalResponse({
-            ok: false,
-            data: registeredUsers
-        });
-        res.json(errorRespnse);
+        res.json({ "message": e });
+
     }
 
 });
