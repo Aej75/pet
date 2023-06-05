@@ -46,11 +46,8 @@ router.get('/', async (req, res) => {
         });
         res.json(finalResponse);
     } catch (e) {
-        const errorRespnse = GlobalResponse({
-            ok: false,
-            data: registeredUsers
-        });
-        res.json(errorRespnse);
+        res.json({ "message": e });
+
     }
 });
 
@@ -65,11 +62,8 @@ router.delete('/:id', async (req, res) => {
         res.json(finalResponse);
 
     } catch (e) {
-        const errorRespnse = GlobalResponse({
-            ok: false,
-            data: registeredUsers
-        });
-        res.json(errorRespnse);
+        res.json({ "message": e });
+
     }
 
 });
