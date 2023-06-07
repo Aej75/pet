@@ -13,13 +13,20 @@ app.use(bodyParser.json());
 
 const postRoute = require("./routes/posts");
 
-const registerRoute = require("./routes/register");
+const userRoute = require("./routes/auth/register");
 
-const petRegisterRoute = require("./routes/pet_register");
+const petRegisterRoute = require("./routes/pets/pet");
 
-app.use("/register", registerRoute);
+
+const loginRoute = require("./routes/auth/login");
+
+const profileRoute = require("./routes/user_profile");
+
+app.use("/auth", loginRoute);
+app.use("/profile", profileRoute);
+app.use("/auth", userRoute);
 app.use("/", postRoute);
-app.use("/pet_register", petRegisterRoute);
+app.use("/pet", petRegisterRoute);
 
 //connection to DATabase
 
@@ -30,5 +37,4 @@ mongoose
   });
 
 //Listen
-
 app.listen(3000);
