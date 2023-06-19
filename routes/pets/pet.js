@@ -12,7 +12,7 @@ const jwt = require('jsonwebtoken');
 
 router.get('/all_pets', async (req, res) => {
     try {
-        console.log('Loading');
+        // console.log('Loading');
 
         const pets = await Pet.find();
         console.log(pets);

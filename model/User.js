@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-
 const UserSchema = mongoose.Schema({
 
 
@@ -9,7 +8,9 @@ const UserSchema = mongoose.Schema({
     },
     email: {
         type: String,
-        require: true
+        require: true,
+        unique: true,
+        lowercase: true,
     },
     password: {
         type: String,
@@ -34,6 +35,11 @@ const UserSchema = mongoose.Schema({
     imageBase64: {
         type: String,
         require: true
+    },
+    isVerified: {
+        type: Boolean,
+        require: true,
+        default: false,
     },
 });
 

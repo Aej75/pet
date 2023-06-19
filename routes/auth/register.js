@@ -44,13 +44,13 @@ router.post('/register', [
     }
 
 
-    const { fullName, email, password, contact, country, city, street, imageBase64 } = req.body;
+    const { fullName, email, password, contact, country, city, street, imageBase64, isVerified } = req.body;
 
 
     try {
         const saltRounds = 10;
         const hashedPassword = await bcrypt.hash(password, saltRounds);
-        console.log(hashedPassword);
+        // console.log(hashedPassword);
         const user = User({
             fullName,
             email,
@@ -59,7 +59,8 @@ router.post('/register', [
             country,
             city,
             street,
-            imageBase64
+            imageBase64,
+            isVerified
         });
 
         const saveToDB = await user.save();

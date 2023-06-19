@@ -12,35 +12,42 @@ router.post('/login', async (req, res) => {
 
     try {
         const { email, password } = req.body;
-        const user = await User.findOne({ email: email });
-        const hashedPassword = user.password;
 
+        const user = await User.findOne({ email: email });
+
+        if (!user) {
+            throw new Error('User not found');
+        }
+        const hashedPassword = user.password;
         const comparePassword = await bcrypt.compare(password, hashedPassword);
 
         if (comparePassword) {
-            // Passwords match, create an access token with an expiration time
-            const jwtAccessToken = jwt.sign({ userId: user._id }, 'secretKey', { expiresIn: '1h' });
+
+            if (user.isVerified) {
+
+                // Passwords match, create an access token with an expiration time
+                const jwtAccessToken = jwt.sign({ userId: user._id }, 'secretKey', { expiresIn: '1h' });
 
 
-            const finalResponse = GlobalResponse({
-                ok: true,
-                accessToken: jwtAccessToken
-            });
-            res.json(finalResponse);
+                const finalResponse = GlobalResponse({
+                    ok: true,
+                    accessToken: jwtAccessToken,
+                    data: user
+                });
+                res.json(finalResponse);
+            } else {
+                throw Error("User not verified")
+            }
         } else {
-            const finalResponse = GlobalResponse({
-                ok: false,
-                message: "Invalid Password!"
-            });
-            res.json(finalResponse);
+            throw Error("Invalid Password!");
         }
 
     } catch (e) {
         const finalResponse = GlobalResponse({
             ok: false,
-            message: 'Account doesn\'t exist'
+            message: e.message
         });
-        res.json(finalResponse);
+        res.status(400).json(finalResponse);
     }
 });
 

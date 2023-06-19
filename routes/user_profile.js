@@ -7,7 +7,7 @@ const { body } = require('express-validator');
 
 const router = express.Router();
 
-router.post('/',
+router.get('/',
     async (req, res) => {
         try {
             // Extract the authorization token from the request headers
