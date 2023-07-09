@@ -22,22 +22,15 @@ router.post('/login', async (req, res) => {
         const comparePassword = await bcrypt.compare(password, hashedPassword);
 
         if (comparePassword) {
+            // Passwords match, create an access token with an expiration time
+            const jwtAccessToken = jwt.sign({ userId: user._id }, 'secretKey', { expiresIn: '1h' });
+            const finalResponse = GlobalResponse({
+                ok: true,
+                accessToken: jwtAccessToken,
+                data: user
+            });
+            res.json(finalResponse);
 
-            if (user.isVerified) {
-
-                // Passwords match, create an access token with an expiration time
-                const jwtAccessToken = jwt.sign({ userId: user._id }, 'secretKey', { expiresIn: '1h' });
-
-
-                const finalResponse = GlobalResponse({
-                    ok: true,
-                    accessToken: jwtAccessToken,
-                    data: user
-                });
-                res.json(finalResponse);
-            } else {
-                throw Error("User not verified")
-            }
         } else {
             throw Error("Invalid Password!");
         }

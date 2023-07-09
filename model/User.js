@@ -32,9 +32,10 @@ const UserSchema = mongoose.Schema({
         type: String,
         require: true
     },
-    imageBase64: {
+    avatar: {
         type: String,
-        require: true
+        require: true,
+        default: ''
     },
     isVerified: {
         type: Boolean,

@@ -5,6 +5,7 @@ const { body, validationResult } = require('express-validator');
 
 const router = express.Router();
 const bcrypt = require('bcrypt');
+const authRequired = require('../../middleware/auth_required');
 
 
 //Register Users
@@ -23,10 +24,8 @@ router.post('/register', [
 
     body('password').notEmpty().withMessage('Password is required'),
     body('contact').notEmpty().withMessage('Contact information is required'),
-    body('country').notEmpty().withMessage('Country is required'),
     body('city').notEmpty().withMessage('City is required'),
     body('street').notEmpty().withMessage('Street address is required'),
-    body('imageBase64').notEmpty().withMessage('Image is required')
 
 ], async (req, res) => {
     const errors = validationResult(req);
@@ -44,7 +43,7 @@ router.post('/register', [
     }
 
 
-    const { fullName, email, password, contact, country, city, street, imageBase64, isVerified } = req.body;
+    const { fullName, email, password, contact, city, street } = req.body;
 
 
     try {
@@ -56,11 +55,10 @@ router.post('/register', [
             email,
             password: hashedPassword,
             contact,
-            country,
+
             city,
             street,
-            imageBase64,
-            isVerified
+
         });
 
         const saveToDB = await user.save();
@@ -117,6 +115,50 @@ router.delete('/:id', async (req, res) => {
 
     }
 
+});
+
+
+router.patch('/verify', authRequired, async (req, res) => {
+    try {
+        const user = req.user;
+        user.isVerified = req.body.isVerified;
+
+        const saveToDB = await user.save();
+        const finalResponse = GlobalResponse({
+            ok: true,
+            data: saveToDB
+        });
+
+        res.json(finalResponse);
+
+    } catch (error) {
+        const finalResponse = GlobalResponse({
+            ok: false,
+            message: error
+        });
+        res.json(finalResponse);
+    }
+});
+router.post('/avatar', authRequired, async (req, res) => {
+    try {
+        const user = req.user;
+        user.avatar = req.body.avatar;
+
+        const saveToDB = await user.save();
+        const finalResponse = GlobalResponse({
+            ok: true,
+            data: saveToDB
+        });
+
+        res.json(finalResponse);
+
+    } catch (error) {
+        const finalResponse = GlobalResponse({
+            ok: false,
+            message: error
+        });
+        res.json(finalResponse);
+    }
 });
 
 
