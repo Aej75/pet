@@ -18,24 +18,28 @@ const PetSchema = mongoose.Schema({
         type: Number,
         required: true
     },
-
     gender: {
         type: String,
         required: true
     },
-
     description: {
         type: String,
         required: true
     },
-
     images: {
         type: [String],
         required: true
     },
-
     nature: {
         type: [String],
+        required: true
+    },
+    ownerId: {
+        type: String,
+        required: true
+    },
+    ownerName: {
+        type: String,
         required: true
     }
 
