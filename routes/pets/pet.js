@@ -8,7 +8,10 @@ const GlobalResponse = require('../../model/global_response')
 const { body, validationResult } = require('express-validator');
 const jwt = require('jsonwebtoken');
 
-
+const authRequired = require('../../middleware/auth_required');
+const RequestedPet = require('../../model/requested_pet');
+const upload = require('../../middleware/multer');
+const cloudinary = require('../../utils/cloudinary');
 
 router.get('/all_pets', async (req, res) => {
     try {
@@ -34,43 +37,53 @@ router.get('/all_pets', async (req, res) => {
 
 
 //Register the pet here ===============>
-router.post('/register', [
+router.post('/register', authRequired, upload.array('images', 5), [
     body('name').notEmpty().withMessage('Name of your pet is required'),
     body('age').notEmpty().withMessage('Age is required'),
     body('breed').notEmpty().withMessage('Breed is required'),
     body('gender').notEmpty().withMessage('Gender is required'),
     body('description').notEmpty().withMessage('Description is required'),
     body('weight').notEmpty().withMessage('Weight is required'),
-    body('images').notEmpty().withMessage('Images are required'),
     body('nature').notEmpty().withMessage('Nature is required'),
 
 ], async (req, res) => {
 
 
+    const errors = validationResult(req);
+
+
+    //Error handling / Validation 
+    if (!errors.isEmpty()) {
+        const errorMessages = errors.array().map(error => error.msg);
+
+        const finalErrorRespnse = GlobalResponse({
+            ok: false,
+            message: errorMessages.join(', ')
+        });
+        return res.status(400).json(finalErrorRespnse);
+    }
     try {
-        // Extract the authorization token from the request headers
-        const token = req.headers.authorization;
 
-        // Verify and decode the token to get the user information
-        const decodedToken = jwt.verify(token, 'secretKey');
-        const userId = decodedToken.userId;
-        // Fetch the user details from the database based on the user ID
-
-        const errors = validationResult(req);
+        const imagesPaths = req.files.map(file => file.path);
+        const { name, age, breed, gender, description, weight, nature } = req.body;
 
 
-        //Error handling / Validation 
-        if (!errors.isEmpty()) {
-            const errorMessages = errors.array().map(error => error.msg);
+        let imageLink = [];
 
-            const finalErrorRespnse = GlobalResponse({
-                ok: false,
-                message: errorMessages.join(', ')
-            });
-            return res.status(400).json(finalErrorRespnse);
-        }
+        await Promise.all(
+            imagesPaths.map(
+                async (e) => await cloudinary.v2.uploader.upload(e).then(
+                    (e) => {
+                        imageLink.push(e.secure_url);
+                    }
+                ).catch(e => {
+                    throw Error('Image upload Failed!')
 
-        const { name, age, breed, gender, description, weight, images, nature } = req.body;
+                })
+            )
+        );
+
+        console.log(imageLink);
 
         const petDetails = Pet({
             name,
@@ -79,9 +92,9 @@ router.post('/register', [
             gender,
             description,
             weight,
-            images,
+            images: imageLink,
             nature,
-            ownerId: userId,
+            ownerId: req.user._id,
         });
 
 
@@ -98,7 +111,7 @@ router.post('/register', [
     } catch (e) {
         const finalResponse = GlobalResponse({
             ok: false,
-            message: "Please login to continue!"
+            message: e.message
         });
         res.status(404).json(finalResponse);
     }
@@ -148,7 +161,34 @@ router.get('/my_pet', async (req, res) => {
 
 });
 
+router.post('/request', authRequired, async (req, res) => {
+    try {
+        const user = req.user;
 
+        const { petID } = req.body;
+        const model = RequestedPet({
+            senderID: user._id,
+            requestedDate: Date.now(),
+            petID: petID
+        });
+
+        const saveToDB = await model.save();
+
+        const finalResponse = GlobalResponse({
+            ok: true,
+            data: saveToDB
+        });
+
+        res.json(finalResponse);
+
+    } catch (error) {
+        const finalResponse = GlobalResponse({
+            ok: false,
+            message: error
+        });
+        res.json(finalResponse);
+    }
+});
 
 
 module.exports = router;

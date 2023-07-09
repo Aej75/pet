@@ -10,6 +10,7 @@ const mongoose = require('mongoose');
 const User = require('../../model/User');
 const Pet = require('../../model/Pet');
 const promotion = require('../../model/promotion');
+const requestedpets = require('../../model/requested_pet');
 
 
 
@@ -37,6 +38,14 @@ const adminBro = new AdminBro({
         },
         {
             resource: promotion,
+            options: {
+                parent: {
+                    name: 'Database',
+                    icon: 'fas fa-database',
+                },
+            },
+        }, {
+            resource: requestedpets,
             options: {
                 parent: {
                     name: 'Database',
