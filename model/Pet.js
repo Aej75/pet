@@ -37,6 +37,10 @@ const PetSchema = mongoose.Schema({
     ownerId: {
         type: String,
         required: true
+    },
+    ownerName: {
+        type: String,
+        required: true
     }
 
 });

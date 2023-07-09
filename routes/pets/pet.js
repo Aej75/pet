@@ -72,7 +72,7 @@ router.post('/register', authRequired, upload.array('images', 5), [
 
         await Promise.all(
             imagesPaths.map(
-                async (e) => await cloudinary.v2.uploader.upload(e).then(
+                async (e) => await cloudinary.v2.uploader.upload(e, { folder: req.user._id }).then(
                     (e) => {
                         imageLink.push(e.secure_url);
                     }
@@ -95,6 +95,7 @@ router.post('/register', authRequired, upload.array('images', 5), [
             images: imageLink,
             nature,
             ownerId: req.user._id,
+            ownerName: req.user.fullName,
         });
 
 

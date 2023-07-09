@@ -28,6 +28,8 @@ const promotionRoute = require("./routes/promotions/promotion");
 
 const adminRoute = require("./routes/adminBro/admin.router")
 
+const changePassword = require('./routes/auth/change_password')
+
 app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3001');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
@@ -52,7 +54,7 @@ app.use("/auth", userRoute);
 app.use("/pet", petRegisterRoute);
 app.use("/promotion", promotionRoute);
 app.use("/admin", adminRoute)
-
+app.use("/change_password", changePassword);
 //connection to DATabase
 
 
